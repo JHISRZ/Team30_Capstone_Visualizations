@@ -1,9 +1,7 @@
 import pandas as pd
 
-# --------------------------------------------------
-# Loadthe cassise data (but EPIC puts trash above the real header so we fix that)
-# --------------------------------------------------
-
+# Loadthe cassise data 
+# EPIC puts trash above the real header so we skip it
 file_path = "Original_Data/ED_Encounters_Admissions_Inpatient4to7.csv"
 
 # load raw without assuming header row
@@ -20,9 +18,9 @@ for i in range(len(df_raw)):
 if header_row_index is None:
     raise ValueError("Could not find header row containing 'ED Disposition' because EPIC SUCKS")
 
-print(f"Detected real header row at index: {header_row_index}")
+print(f"Real header row at index: {header_row_index}")
 
-# now reload properly using correct header row
+# now reload with the right header row
 df = pd.read_csv(
     file_path,
     skiprows=header_row_index,
@@ -41,10 +39,6 @@ print("Cleaned column names loaded.")
 print("Total rows before filtering:", len(df))
 
 
-# --------------------------------------------------
-# FILTER TO CORRECT POPULATION
-# --------------------------------------------------
-
 # keep only patients that were admitted
 df = df[df["ED Disposition"].str.contains("Admit", case=False, na=False)]
 
@@ -59,11 +53,9 @@ df = df[df["Admitting Department"].str.contains(
 
 print("Filtered rows after admission + department filter:", len(df))
 
-
-# --------------------------------------------------
 # The timeopsans athat are actually in the scope
 # find the 4 columns using partial matching
-# --------------------------------------------------
+
 
 minutes_to_keep = []
 
@@ -95,9 +87,7 @@ for col in minutes_to_keep:
     if col in df_clean.columns:   # safety check so it don’t crash
         df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
 
-# --------------------------------------------------
 # Save the cleaned csv
-# --------------------------------------------------
 
 df_clean.to_csv("data/cleaned/ED_cleaned.csv", index=False)
 
