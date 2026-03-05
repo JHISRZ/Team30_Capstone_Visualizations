@@ -6,7 +6,7 @@ import numpy as np
 
 
 #where are we going?
-input_path = "/Users/jorgesuarez/Desktop/SENIOR DESIGN GIT/data/cleaned/ED_correct_flow_only.csv"
+input_path = "ED_correct_flow_only.csv"
 
 
 #load csv into daddyframr
@@ -69,3 +69,25 @@ for col in df.columns:
 print("\nColumns being used:")
 for label, column in steps.items():
     print(column, "→", column in df.columns)
+
+
+
+# ── SEGMENT BREAKDOWN ────────────────────────────────────────────────────────
+df["dispo_bed"]   = pd.to_numeric(df["Dispo to Bed Assigned (minutes)"], errors="coerce")
+df["bed_admit"]   = pd.to_numeric(df["Bed Assigned to Admit (minutes)"], errors="coerce")
+df["req_admit"]   = pd.to_numeric(df["Bed Request to Admit (minutes)"], errors="coerce")
+df["req_to_assigned"]  = df["req_admit"] - df["bed_admit"]
+df["dispo_to_request"] = df["dispo_bed"] - df["req_to_assigned"]
+
+total_med = df["Disposition to Depart (minutes)"].abs().dropna().median()
+
+print("\n\nSEGMENT STATS FOR PROCESS MAP")
+print(f"{'Step':<32} {'Median':>8} {'SD':>8} {'P25':>8} {'P75':>8} {'% Tot':>7}")
+print("-" * 75)
+for label, col in [("Dispo → Bed Request", "dispo_to_request"),
+                    ("Bed Request → Bed Assigned", "req_to_assigned"),
+                    ("Bed Assigned → Admitted", "bed_admit"),
+                    ("TOTAL: Dispo → Admitted", "Disposition to Depart (minutes)")]:
+    v = pd.to_numeric(df[col], errors="coerce").dropna()
+    v = v[v >= 0]
+    print(f"{label:<32} {v.median():>7.0f}m {v.std():>7.0f}m {v.quantile(.25):>7.0f}m {v.quantile(.75):>7.0f}m {v.median()/total_med*100:>6.0f}%")
