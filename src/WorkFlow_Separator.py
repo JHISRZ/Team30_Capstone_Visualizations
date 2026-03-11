@@ -19,6 +19,8 @@ df["Disposition_vs_Bed_Request"] = np.where(
 )
 
 
+
+
 # Bed Request vs Bed Assigned
 df["Request_vs_Assigned"] = np.where(
     df["Dispo to Bed Assigned (minutes)"] < 0,
