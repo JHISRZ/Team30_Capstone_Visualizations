@@ -69,3 +69,21 @@ for k, v in medians.items():
 
 print(f"\nTotal Median Admission Time: {round(total_median,2)} minutes")
 print("\nThis shows which stage consumes the largest share of total time.\n")
+
+# --- BOARDROOM SUMMARY PRINT ---
+print("-" * 40)
+print("📊 EMERGENCY DEPARTMENT FLOW ANALYSIS")
+print("-" * 40)
+
+for label, value in medians.items():
+    # Calculating the exact minutes and seconds for that extra "precision" look
+    mins = int(value)
+    secs = int((value - mins) * 60)
+    
+    percent = (value / total_median) * 100
+    print(f"{label:<25} | {value:>6.2f} min ({mins}m {secs}s) | {percent:>5.1f}%")
+
+print("-" * 40)
+print(f"{'TOTAL MEDIAN TIME':<25} | {total_median:>6.2f} min")
+print("-" * 40)
+print("✅ Calculations based on absolute median values per sequential step.")
